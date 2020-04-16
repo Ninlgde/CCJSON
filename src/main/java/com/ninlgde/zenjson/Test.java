@@ -106,9 +106,10 @@ public class Test {
 
         String fname = "resources/data/twitter.json";
 
+//        testFastJson(fname);
         testJZen(fname);
 //        testJZenNormal(fname);
-        System.in.read();
+//        System.in.read();
     }
 
     public static String readFile(String Path) {

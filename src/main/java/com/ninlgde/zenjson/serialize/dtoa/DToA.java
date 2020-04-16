@@ -135,6 +135,4 @@ public class DToA {
 
         return Double.toString(value).getBytes();
     }
-
-//    public static byte[] d64toaByte()
 }

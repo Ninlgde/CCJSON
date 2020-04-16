@@ -19,7 +19,6 @@ public class Serializer {
         int fmt = formatted ? 1 : 0;
         switch (value.getType()) {
             case JsonType.JSON_NUMBER:
-//                writer.writeNumber(value.toNumber());
                 writer.writeNumberBytes(value.toBytes());
                 break;
             case JsonType.JSON_LONG:
