@@ -1,6 +1,6 @@
 package com.ninlgde.zenjson.base;
 
-public class Node implements Cloneable {
+public final class Node implements Cloneable {
 
     public Value value = null;
     public Node next = null;

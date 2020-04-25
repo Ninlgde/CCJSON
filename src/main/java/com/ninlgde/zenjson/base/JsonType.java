@@ -28,6 +28,7 @@ public class JsonType {
     }
 
     public static String getString(int type) {
-        return map.getOrDefault(type, "unknown");
+        String result = map.get(type);
+        return result == null ? "unknown" : result;
     }
 }

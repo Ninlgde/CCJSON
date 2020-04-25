@@ -4,6 +4,7 @@ import com.ninlgde.zenjson.utils.TwoTuple;
 
 import java.nio.ByteBuffer;
 
+@Deprecated
 public class Grisu2 {
 
     public static int grisu2(double value, ByteBuffer buffer) {

@@ -1,9 +1,11 @@
 package com.ninlgde.zenjson.file;
 
 import com.ninlgde.zenjson.JSONObject;
-import com.ninlgde.zenjson.Json;
+import com.ninlgde.zenjson.JSON;
 import com.ninlgde.zenjson.serialize.error.JsonDeserializeException;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -13,27 +15,29 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class JSONFileReader {
 
-    public static JSONObject parseFile(String fname) throws JsonDeserializeException, IOException {
-        FileChannel fc = new RandomAccessFile(fname, "rw").getChannel();
+    @Deprecated
+    public static JSONObject parseFileRW(String filename) throws JsonDeserializeException, IOException {
+        FileChannel fc = new RandomAccessFile(filename, "rw").getChannel();
 
+        // mmap zero copy to buffer
         MappedByteBuffer buffer = fc.map(FileChannel.MapMode.READ_WRITE, 0, fc.size());
 
-        ByteBuffer buffer1 = ByteBuffer.allocate((int) fc.size());
+        // copy to user space
+        ByteBuffer buffer1 = ByteBuffer.allocateDirect((int) fc.size());
         buffer1.put(buffer);
 
-        return Json.parse(buffer1);
+        // parse to jvm heap
+        return JSON.parse(buffer1);
     }
 
-    public static void main(String[] args) throws IOException, JsonDeserializeException {
 
-        String fname = "resources/data/test.json";
+    public static JSONObject parseFile(String filename) throws JsonDeserializeException, IOException {
+        FileChannel fc = new FileInputStream(filename).getChannel();
 
-        JSONObject jsonObject = parseFile(fname);
+        // mmap zero copy to buffer
+        MappedByteBuffer buffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
-        jsonObject.put("double", ThreadLocalRandom.current().nextDouble());
-        jsonObject.put("int", ThreadLocalRandom.current().nextInt());
-        jsonObject.put("name", "machicheng");
-
-        System.out.println(jsonObject.dump());
+        // parse to jvm heap
+        return JSON.parse(buffer);
     }
 }

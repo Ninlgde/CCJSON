@@ -1,15 +1,15 @@
 package com.ninlgde.zenjson;
 
 import com.ninlgde.zenjson.base.JsonType;
+import com.ninlgde.zenjson.serialize.JSONSerializable;
 import com.ninlgde.zenjson.utils.LRUCache;
 import com.ninlgde.zenjson.base.Node;
 import com.ninlgde.zenjson.base.Value;
 import com.ninlgde.zenjson.serialize.error.JsonTypeException;
 
-import java.io.Serializable;
 import java.util.*;
 
-public class JSONObject extends Json implements Map<String, Object>, Cloneable, Serializable {
+public class JSONObject extends JSON implements Map<String, Object>, Cloneable, JSONSerializable {
 
     private final LRUCache<String, Node> cache;
     private static final int DEFAULT_CACHE_SIZE = 10;
@@ -34,6 +34,11 @@ public class JSONObject extends Json implements Map<String, Object>, Cloneable, 
         size = 0;
         cache = new LRUCache<>(Math.max(map.size() >> 1, DEFAULT_CACHE_SIZE));
         putAll(map);
+    }
+
+    public JSONObject(JSONSerializable object) {
+        // todo: 使用反射解析对象
+        cache = new LRUCache<>(DEFAULT_CACHE_SIZE);
     }
 
     private Node search(String name) {
@@ -233,9 +238,9 @@ public class JSONObject extends Json implements Map<String, Object>, Cloneable, 
     @Override
     public void putAll(Map m) {
         Objects.requireNonNull(m);
-        m.forEach((k, v)->{
-            put((String) k, v);
-        });
+        for (Object key : m.keySet()) {
+            put((String) key, m.get(key));
+        }
     }
 
     @Override

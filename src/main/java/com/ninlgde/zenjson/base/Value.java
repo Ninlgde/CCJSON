@@ -1,6 +1,6 @@
 package com.ninlgde.zenjson.base;
 
-public class Value implements Cloneable, Comparable<Value> {
+public final class Value implements Cloneable, Comparable<Value> {
 
     public static final int JSON_VALUE_TAG_MASK = 0xF;
 
@@ -95,7 +95,7 @@ public class Value implements Cloneable, Comparable<Value> {
     }
 
     public byte[] toBytes() {
-        assert getType() == JsonType.JSON_STRING;
+        assert getType() == JsonType.JSON_STRING || getType() == JsonType.JSON_NUMBER;
         return str;
     }
 

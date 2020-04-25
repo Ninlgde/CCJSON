@@ -1,16 +1,24 @@
 package com.ninlgde.zenjson.serialize.writer;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ByteBufWriter extends Writer {
 
     public ByteBuffer buffer;
 
+    // 统计信息
+    private int reallocateTimes = 0;
+    protected static volatile AtomicLong reallocateTotalTimes = new AtomicLong(0);
+    protected static volatile AtomicLong newTimes = new AtomicLong();
+
     public ByteBufWriter(ByteBuffer buffer) {
         this.buffer = buffer;
+        newTimes.getAndIncrement();
     }
 
     public ByteBufWriter() {
+        newTimes.getAndIncrement();
     }
 
     public void puts(byte[] bytes) {
@@ -37,6 +45,7 @@ public class ByteBufWriter extends Writer {
     }
 
     private void reallocate() {
+        int oldPosition = buffer.position();
         int newCap = newCapacity();
         ByteBuffer newBuf;
         if (buffer.isDirect()) {
@@ -46,14 +55,16 @@ public class ByteBufWriter extends Writer {
         }
         buffer.position(0);
         newBuf.put(buffer);
-        newBuf.position(buffer.position());
+        newBuf.position(oldPosition); // set the last position
         buffer = newBuf;
+        countReallocate();
     }
 
-    private int reallocateTimes = 0;
+    protected void countReallocate() {
+    }
 
     private int newCapacity() {
-        if (reallocateTimes++ < 5) {
+        if (reallocateTimes++ < 10) {
             return (buffer.capacity() << 1); // reallocate 2x
         }
         return (buffer.capacity() << 1) - (buffer.capacity() >> 1); // reallocate 1.5x

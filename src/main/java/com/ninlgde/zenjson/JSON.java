@@ -2,7 +2,7 @@ package com.ninlgde.zenjson;
 
 import com.ninlgde.zenjson.base.Node;
 import com.ninlgde.zenjson.base.Value;
-import com.ninlgde.zenjson.serialize.error.DeserializeError;
+import com.ninlgde.zenjson.serialize.JSONSerializable;
 import com.ninlgde.zenjson.base.JsonType;
 import com.ninlgde.zenjson.serialize.Deserializer;
 import com.ninlgde.zenjson.serialize.error.JsonDeserializeException;
@@ -11,22 +11,21 @@ import com.ninlgde.zenjson.serialize.writer.ByteBufWriter;
 import com.ninlgde.zenjson.serialize.writer.StringWriter;
 import com.ninlgde.zenjson.serialize.writer.Writer;
 
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Json implements Serializable {
+public abstract class JSON implements JSONSerializable {
 
     protected Value root;
 
     protected Node tail;
     protected int size;
 
-    public Json() {
+    public JSON() {
     }
 
-    public Json(Value value) {
+    public JSON(Value value) {
         this.root = value;
     }
 
@@ -38,21 +37,6 @@ public abstract class Json implements Serializable {
         for (Node node = root.toNode(); node != null; size++ /*calculate size*/, node = node.next)
             tail = node;
     }
-
-//    public Json(String jsonstr) throws JsonException {
-//        ByteBuffer buffer = ByteBuffer.wrap(jsonstr.getBytes());
-//        root = Value.typeToValue(JsonType.JSON_OBJECT, null);
-//        DeserializeError error = Deserializer.parse(buffer, root);
-//        if (error != DeserializeError.ERROR_NO_ERROR)
-//            throw new JsonException(error);
-//    }
-//
-//    public Json(ByteBuffer buffer) throws JsonException {
-//        root = Value.typeToValue(JsonType.JSON_OBJECT, null);
-//        DeserializeError error = Deserializer.parse(buffer, root);
-//        if (error != DeserializeError.ERROR_NO_ERROR)
-//            throw new JsonException(error);
-//    }
 
     protected Object valueToObject(Value v) {
         if (v == null)
@@ -89,8 +73,8 @@ public abstract class Json implements Serializable {
             value = Value.typeToValue(JsonType.JSON_NUMBER, Double.toString(d).getBytes());
         } else if (object instanceof String) {
             value = Value.typeToValue(JsonType.JSON_STRING, ((String) object).getBytes());
-        } else if (object instanceof Json) {
-            Json jo = (Json) object;
+        } else if (object instanceof JSON) {
+            JSON jo = (JSON) object;
             value = jo.root; // Json obj use reference
         } else if (object instanceof List) {
             List list = (List) object;
@@ -99,6 +83,10 @@ public abstract class Json implements Serializable {
         } else if (object instanceof Map) {
             Map map = (Map) object;
             JSONObject array = new JSONObject(map);
+            value = Value.typeToValue(JsonType.JSON_OBJECT, array.root.toNode());
+        } else if (object instanceof JSONSerializable) {
+            JSONSerializable jsonSerializable = (JSONSerializable) object;
+            JSONObject array = new JSONObject(jsonSerializable);
             value = Value.typeToValue(JsonType.JSON_OBJECT, array.root.toNode());
         } else {
             // default to null
@@ -127,6 +115,14 @@ public abstract class Json implements Serializable {
     public static JSONArray parseArray(ByteBuffer buffer) throws JsonDeserializeException {
         Value value = Deserializer.parse(buffer);
         return new JSONArray(value);
+    }
+
+    public static <T> T parseObject(String jsonstr, Class<T> clazz) {
+        return null;
+    }
+
+    public static <T> T parseObject(ByteBuffer buffer, Class<T> clazz) {
+        return null;
     }
 
     public String dump() {

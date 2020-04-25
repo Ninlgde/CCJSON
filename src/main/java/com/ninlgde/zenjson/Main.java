@@ -1,11 +1,9 @@
 package com.ninlgde.zenjson;
 
 import com.ninlgde.zenjson.serialize.error.JsonDeserializeException;
-import com.ninlgde.zenjson.serialize.error.JsonException;
 import com.ninlgde.zenjson.serialize.error.JsonTypeException;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +18,7 @@ public class Main {
                 "\"bool\": {}}" +
                 "}";
 //        String jsonstr = "{\"bbbb\":{}}";//"{\"aa\":912345678900e100}";
-        JSONObject jsonstrr = (JSONObject) Json.parse(jsonstr);
+        JSONObject jsonstrr = (JSONObject) JSON.parse(jsonstr);
 //        jsonstrr.remove("dddd");
 //        jsonstrr.remove("eeeee");
         jsonstrr.remove("bool");
@@ -79,7 +77,7 @@ public class Main {
 //        buffer.get(bytes);
         System.out.println(string);
 
-        JSONObject a = (JSONObject) Json.parse(string);
+        JSONObject a = (JSONObject) JSON.parse(string);
         JSONArray ar = a.getJSONArray("list");
         System.out.println(ar.get(1));
 

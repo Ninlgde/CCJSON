@@ -3,12 +3,11 @@ package com.ninlgde.zenjson;
 import com.ninlgde.zenjson.base.JsonType;
 import com.ninlgde.zenjson.base.Node;
 import com.ninlgde.zenjson.base.Value;
+import com.ninlgde.zenjson.serialize.JSONSerializable;
 
-import java.io.Serializable;
 import java.util.*;
-import java.util.function.Consumer;
 
-public class JSONArray extends Json implements List<Object>, Cloneable, RandomAccess, Serializable {
+public class JSONArray extends JSON implements List<Object>, Cloneable, RandomAccess, JSONSerializable {
 
     int modCount = 0;
 
@@ -104,16 +103,22 @@ public class JSONArray extends Json implements List<Object>, Cloneable, RandomAc
     @Override
     public boolean addAll(Collection c) {
         Objects.requireNonNull(c);
-        for (Object o: c) {
+        for (Object o : c) {
             add(o);
         }
         return true;
     }
 
+    private int checkIndex(int index, int length) {
+        if (index < 0 || index >= length)
+            throw new IndexOutOfBoundsException("Index out of range: " + index);
+        return index;
+    }
+
     @Override
     public boolean addAll(int index, Collection c) {
         Objects.requireNonNull(c);
-        Objects.checkIndex(index, size);
+        checkIndex(index, size);
         Node node = findNode(index);
         assert node != null;
         for (Object o : c) {
@@ -136,7 +141,7 @@ public class JSONArray extends Json implements List<Object>, Cloneable, RandomAc
 
     @Override
     public Object get(int index) {
-        Objects.checkIndex(index, size);
+        checkIndex(index, size);
         Node node = findNode(index);
         Value value = null;
         if (node != null)
@@ -146,7 +151,7 @@ public class JSONArray extends Json implements List<Object>, Cloneable, RandomAc
 
     @Override
     public Object set(int index, Object element) {
-        Objects.checkIndex(index, size);
+        checkIndex(index, size);
         Value value = objectToValue(element);
         Node node = findNode(index);
         assert node != null;
@@ -157,7 +162,7 @@ public class JSONArray extends Json implements List<Object>, Cloneable, RandomAc
 
     @Override
     public void add(int index, Object element) {
-        Objects.checkIndex(index, size);
+        checkIndex(index, size);
         Node node = findNode(index - 1); // insert after find prev
         assert node != null;
         Value value = objectToValue(element);
@@ -193,7 +198,7 @@ public class JSONArray extends Json implements List<Object>, Cloneable, RandomAc
 
     @Override
     public Object remove(int index) {
-        Objects.checkIndex(index, size);
+        checkIndex(index, size);
         Node node = removeAt(index);
         Value value = null;
         if (node != null)
@@ -236,8 +241,8 @@ public class JSONArray extends Json implements List<Object>, Cloneable, RandomAc
 
     @Override
     public List<Object> subList(int fromIndex, int toIndex) {
-        Objects.checkIndex(fromIndex, size);
-        Objects.checkIndex(toIndex, size);
+        checkIndex(fromIndex, size);
+        checkIndex(toIndex, size);
         Node node = findNode(fromIndex);
         List<Object> array = new ArrayList<>();
         for (int i = fromIndex; i < toIndex; i++, node = node.next) {
@@ -334,20 +339,20 @@ public class JSONArray extends Json implements List<Object>, Cloneable, RandomAc
             }
         }
 
-        @Override
-        public void forEachRemaining(Consumer<? super Object> action) {
-            Objects.requireNonNull(action);
-            final int size = JSONArray.this.size;
-            int i = cursor;
-            if (i < size) {
-                for (; i < size && modCount == expectedModCount; i++)
-                    action.accept(JSONArray.this.get(i));
-                // update once at end to reduce heap write traffic
-                cursor = i;
-                lastRet = i - 1;
-                checkForComodification();
-            }
-        }
+//        @Override
+//        public void forEachRemaining(Consumer<? super Object> action) {
+//            Objects.requireNonNull(action);
+//            final int size = JSONArray.this.size;
+//            int i = cursor;
+//            if (i < size) {
+//                for (; i < size && modCount == expectedModCount; i++)
+//                    action.accept(JSONArray.this.get(i));
+//                // update once at end to reduce heap write traffic
+//                cursor = i;
+//                lastRet = i - 1;
+//                checkForComodification();
+//            }
+//        }
 
         final void checkForComodification() {
             if (modCount != expectedModCount)

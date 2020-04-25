@@ -55,6 +55,30 @@ public class Deserializer {
         return offset;
     }
 
+    // 编程珠玑里推荐 for里重复处理东西的时候可以使用 if break的方式 提前结束循环减少判断次数
+    // 另据滨哥消息,cpu会对if进行并行计算
+    // 所以推荐一下方法
+    // 但java 编译会优先选择热点代码,拆解循环会使编译延后,反而造成效率降低.
+    @Deprecated
+    private static int skipWhitespace4(ByteBuffer s, int offset) {
+        while (isWhitespace(s.get(offset))) {
+            if (!isWhitespace(s.get(offset+1))) {
+                offset += 1;
+                break;
+            }
+            if (!isWhitespace(s.get(offset+2))) {
+                offset += 2;
+                break;
+            }
+            if (!isWhitespace(s.get(offset+3))) {
+                offset += 3;
+                break;
+            }
+            offset += 4;
+        }
+        return offset;
+    }
+
     public static Value parse(ByteBuffer s) throws JsonDeserializeException {
         Node[] tails = new Node[ZJSON_STACK_SIZE];
         byte[] endChars = new byte[ZJSON_STACK_SIZE];
