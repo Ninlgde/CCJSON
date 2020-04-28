@@ -26,9 +26,9 @@ public class JSONFileReaderTest {
     @Test
     public void parseFile() throws IOException, JsonDeserializeException {
 //        String fname = "data/canada.json"; // 2251051
-        String fname = "data/twitter.json"; // 631515
+//        String fname = "data/twitter.json"; // 631515
 //        String fname = "data/citm_catalog.json"; // 1727205
-//        String fname = "data/test.json";
+        String fname = "data/test.json";
 
         JSONObject jsonObject = JSONFileReader.parseFile(fname);
 

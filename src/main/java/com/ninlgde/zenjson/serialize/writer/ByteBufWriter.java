@@ -67,7 +67,7 @@ public class ByteBufWriter extends Writer {
         if (reallocateTimes++ < 10) {
             return (buffer.capacity() << 1); // reallocate 2x
         }
-        return (buffer.capacity() << 1) - (buffer.capacity() >> 1); // reallocate 1.5x
+        return buffer.capacity() + (buffer.capacity() >> 1); // reallocate 1.5x
     }
 
     public int size() {

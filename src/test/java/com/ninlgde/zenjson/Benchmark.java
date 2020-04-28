@@ -67,6 +67,8 @@ public class Benchmark {
         printResult(fname, "dump", System.nanoTime() - start, length);
 
         System.out.println("testJZenZeroCopy end -- " + new Date());
+
+        System.in.read();
     }
 
     @Test

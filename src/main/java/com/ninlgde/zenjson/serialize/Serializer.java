@@ -7,6 +7,20 @@ import com.ninlgde.zenjson.serialize.writer.Writer;
 
 public class Serializer {
 
+    private static byte[][] s_empty_array = new byte[2][];
+    private static byte[][] s_empty_object = new byte[2][];
+    private static byte[] s_escape_colon = " : ".getBytes();
+    private static byte[] s_true = "true".getBytes();
+    private static byte[] s_false = "false".getBytes();
+    private static byte[] s_null = "null".getBytes();
+
+    static {
+        s_empty_array[0] = "[]".getBytes();
+        s_empty_array[1] = "[ ]".getBytes();
+        s_empty_object[0] = "{}".getBytes();
+        s_empty_object[1] = "{ }".getBytes();
+    }
+
     public static void dump(Writer writer, Value value) {
         dump(writer, value, false);
     }
@@ -32,8 +46,7 @@ public class Serializer {
                 break;
             case JsonType.JSON_ARRAY:
                 if (value.toNode() == null) {
-                    String[] s_empty_array = new String[]{"[]", "[ ]"};
-                    writer.puts(s_empty_array[fmt].getBytes());
+                    writer.puts(s_empty_array[fmt]);
                     break;
                 }
                 writer.putc((byte) '[');
@@ -54,8 +67,7 @@ public class Serializer {
                 break;
             case JsonType.JSON_OBJECT:
                 if (value.toNode() == null) {
-                    String[] s_empty_object = new String[]{"{}", "{ }"};
-                    writer.puts(s_empty_object[fmt].getBytes());
+                    writer.puts(s_empty_object[fmt]);
                     break;
                 }
                 writer.putc((byte) '{');
@@ -65,7 +77,7 @@ public class Serializer {
                     if (formatted) writer.writeTabs(indent);
                     writer.writeEscaped(n.name);
                     if (formatted)
-                        writer.puts(" : ".getBytes());
+                        writer.puts(s_escape_colon);
                     else
                         writer.putc((byte) ':');
                     dump(writer, n.value, formatted, indent);
@@ -80,13 +92,13 @@ public class Serializer {
                 writer.putc((byte) '}');
                 break;
             case JsonType.JSON_TRUE:
-                writer.puts("true".getBytes());
+                writer.puts(s_true);
                 break;
             case JsonType.JSON_FALSE:
-                writer.puts("false".getBytes());
+                writer.puts(s_false);
                 break;
             case JsonType.JSON_NULL:
-                writer.puts("null".getBytes());
+                writer.puts(s_null);
                 break;
         }
     }

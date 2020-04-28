@@ -1,9 +1,8 @@
 package com.ninlgde.zenjson.serialize;
 
+import com.ninlgde.zenjson.base.JsonType;
 import com.ninlgde.zenjson.base.Node;
 import com.ninlgde.zenjson.base.Value;
-import com.ninlgde.zenjson.utils.TwoTuple;
-import com.ninlgde.zenjson.base.JsonType;
 import com.ninlgde.zenjson.serialize.error.DeserializeError;
 import com.ninlgde.zenjson.serialize.error.JsonDeserializeException;
 

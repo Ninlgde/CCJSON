@@ -7,43 +7,47 @@ import com.ninlgde.zenjson.base.Node;
 import com.ninlgde.zenjson.base.Value;
 import com.ninlgde.zenjson.serialize.error.JsonTypeException;
 
+import java.lang.ref.SoftReference;
 import java.util.*;
 
 public class JSONObject extends JSON implements Map<String, Object>, Cloneable, JSONSerializable {
 
-    private final LRUCache<String, Node> cache;
-    private static final int DEFAULT_CACHE_SIZE = 10;
+    private static final int DEFAULT_CACHE_SIZE = 16;
+
+    // 用软引用代替 之前的强应用, 内存不够时优先回收掉
+    private SoftReference<LRUCache<String, Node>> cacheSoftReference;
 
     public JSONObject() {
         super();
         root = Value.typeToValue(JsonType.JSON_OBJECT, null);
         tail = null;
-        cache = new LRUCache<>(DEFAULT_CACHE_SIZE);
+        cacheSoftReference = new SoftReference<>(new LRUCache<String, Node>(DEFAULT_CACHE_SIZE));
     }
 
     public JSONObject(Value value) {
         super(value);
         assert value.getType() == JsonType.JSON_OBJECT;
         findTail();
-        cache = new LRUCache<>(Math.max(size >> 1, DEFAULT_CACHE_SIZE));
+        cacheSoftReference = new SoftReference<>(new LRUCache<String, Node>(Math.max(size >> 1, DEFAULT_CACHE_SIZE)));
     }
 
     public JSONObject(Map map) {
         root = Value.typeToValue(JsonType.JSON_OBJECT, null);
         tail = null;
         size = 0;
-        cache = new LRUCache<>(Math.max(map.size() >> 1, DEFAULT_CACHE_SIZE));
+        cacheSoftReference = new SoftReference<>(new LRUCache<String, Node>(Math.max(size >> 1, DEFAULT_CACHE_SIZE)));
         putAll(map);
     }
 
     public JSONObject(JSONSerializable object) {
         // todo: 使用反射解析对象
-        cache = new LRUCache<>(DEFAULT_CACHE_SIZE);
+        cacheSoftReference = new SoftReference<>(new LRUCache<String, Node>(DEFAULT_CACHE_SIZE));
     }
 
     private Node search(String name) {
         // 提高搜索效率
-        if (cache.containsKey(name))
+        LRUCache<String, Node> cache = cacheSoftReference.get();
+        if (cache != null && cache.containsKey(name))
             return cache.get(name);
         Node node = root.toNode();
         if (node == null)
@@ -53,7 +57,8 @@ public class JSONObject extends JSON implements Map<String, Object>, Cloneable, 
                 break;
             }
         }
-        cache.put(name, node);
+        if (cache != null)
+            cache.put(name, node);
         return node;
     }
 
@@ -151,7 +156,9 @@ public class JSONObject extends JSON implements Map<String, Object>, Cloneable, 
 
     private void insert(String name, Value value) {
         // remove cache
-        cache.remove(name);
+        LRUCache<String, Node> cache = cacheSoftReference.get();
+        if (cache != null)
+            cache.remove(name);
         size++;
         Node newNode = new Node(name.getBytes(), value);
         if (tail == null) {
@@ -186,7 +193,9 @@ public class JSONObject extends JSON implements Map<String, Object>, Cloneable, 
                 }
             }
         }
-        cache.remove(name);
+        LRUCache<String, Node> cache = cacheSoftReference.get();
+        if (cache != null)
+            cache.remove(name);
         return result;
     }
 
@@ -248,7 +257,9 @@ public class JSONObject extends JSON implements Map<String, Object>, Cloneable, 
         root = Value.typeToValue(JsonType.JSON_OBJECT, null);
         tail = null;
         size = 0;
-        cache.clear();
+        LRUCache<String, Node> cache = cacheSoftReference.get();
+        if (cache != null)
+            cache.clear();
     }
 
     @Override
@@ -280,7 +291,7 @@ public class JSONObject extends JSON implements Map<String, Object>, Cloneable, 
         return set;
     }
 
-    private class JSONObjectEntry implements Entry<String, Object> {
+    private static class JSONObjectEntry implements Entry<String, Object> {
 
         private String key;
         private Object value;

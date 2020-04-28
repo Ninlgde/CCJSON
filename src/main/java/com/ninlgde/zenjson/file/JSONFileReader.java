@@ -1,17 +1,15 @@
 package com.ninlgde.zenjson.file;
 
-import com.ninlgde.zenjson.JSONObject;
 import com.ninlgde.zenjson.JSON;
+import com.ninlgde.zenjson.JSONObject;
 import com.ninlgde.zenjson.serialize.error.JsonDeserializeException;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class JSONFileReader {
 
