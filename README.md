@@ -1,4 +1,4 @@
-# JZen
+# CCJson
 A Java high performance JSON library
 
 ## TODO -----
