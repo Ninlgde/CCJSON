@@ -68,7 +68,7 @@ public class Benchmark {
 
         System.out.println("testJZenZeroCopy end -- " + new Date());
 
-        System.in.read();
+//        System.in.read();
     }
 
     @Test

@@ -32,7 +32,7 @@ public class JSONFileWriter {
     }
 
     public static void writeJSON(String filename, JSON json) throws IOException {
-        byte[] bytes = json.dump().getBytes();
+        byte[] bytes = json.dump().trim().getBytes();
 
         writeJSON(filename, bytes);
     }

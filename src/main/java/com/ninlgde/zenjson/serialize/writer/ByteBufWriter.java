@@ -53,7 +53,7 @@ public class ByteBufWriter extends Writer {
         } else {
             newBuf = ByteBuffer.allocate(newCap);
         }
-        buffer.position(0);
+        buffer.flip();
         newBuf.put(buffer);
         newBuf.position(oldPosition); // set the last position
         buffer = newBuf;
@@ -86,7 +86,7 @@ public class ByteBufWriter extends Writer {
     public String toString() {
         int pos = buffer.position();
         byte[] bytes = new byte[pos];
-        buffer.position(0);
+        buffer.flip();
         buffer.get(bytes);
         return new String(bytes);
     }

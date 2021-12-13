@@ -27,7 +27,7 @@ public class StringWriter extends ByteBufWriter {
 
     public String toString() {
         byte[] bytes = new byte[buffer.position()];
-        buffer.position(0);
+        buffer.flip();
         buffer.get(bytes);
         return new String(bytes);
     }
